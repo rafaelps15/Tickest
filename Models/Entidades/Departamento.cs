@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Tickest.Models.Entidades.Usuarios;
 
 namespace Tickest.Models.Entidades
 {
@@ -12,7 +13,8 @@ namespace Tickest.Models.Entidades
         public string Nome { get; set; }
 
         //public ICollection<Area> Areas { get; set; }
-        public ICollection<Usuario> Usuarios { get; set; }
+        public ICollection<UsuarioAnalista> Analistas { get; set; }
+        public ICollection<Especialidade> Especialidades { get; set; }
 
         /*  Não entendi
        [Required]

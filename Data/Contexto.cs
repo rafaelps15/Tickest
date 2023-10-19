@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tickest.Models.Entidades;
+using Tickest.Models.Entidades.Usuarios;
 using Tickest.Models.ViewModels;
 
 namespace Tickest.Data
@@ -14,54 +15,51 @@ namespace Tickest.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UsuarioEspecialidade>()
-                .HasOne(ue => ue.Usuario)
+                .HasOne(ue => ue.Analista)
                 .WithMany(u => u.UsuarioEspecialidades)
-                .HasForeignKey(ue => ue.UsuarioId)
+                .HasForeignKey(ue => ue.AnalistaId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // Configurar relacionamento entre Usuario e TicketsSolicitados
-            modelBuilder.Entity<Usuario>()
-                .HasMany(u => u.TicketsSolicitados)
-                .WithOne(t => t.Solicitante)
-                .HasForeignKey(t => t.SolicitanteId);
+            //modelBuilder.Entity<UsuarioAnalista>()
+            //    .HasOne(u => u.Departamento)
+            //    .WithMany()
+            //    .HasForeignKey(u => u.DepartamentoId)
+            //    .OnDelete(DeleteBehavior.NoAction);
 
-            // Configurar relacionamento entre Usuario e TicketsAnalista
-            modelBuilder.Entity<Usuario>()
-                .HasMany(u => u.TicketsAnalista)
+
+            //modelBuilder.Entity<UsuarioAnalista>()
+            //    .HasOne(u => u.Departamento)
+            //    .WithMany()
+            //    .HasForeignKey(u => u.DepartamentoId);
+
+            modelBuilder.Entity<UsuarioAnalista>()
+                .HasMany(u => u.AberturaTickets)
+                .WithOne(t => t.AbertoPor)
+                .HasForeignKey(t => t.AbertoPorId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UsuarioAnalista>()
+                .HasMany(u => u.TicketResponsaveis)
                 .WithOne(t => t.Analista)
-                .HasForeignKey(t => t.AnalistaId);
-
-            // Configurar relacionamento entre Usuario e TicketsDestinatario
-            modelBuilder.Entity<Usuario>()
-                .HasMany(u => u.TicketsDestinatarios)
-                .WithOne(t => t.Destinatario)
-                .HasForeignKey(t => t.DestinatarioId);
-
-            // Configurar relacionamento entre Ticket e Solicitante
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.Solicitante)
-                .WithMany(u => u.TicketsSolicitados)
-                .HasForeignKey(t => t.SolicitanteId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            // Configurar relacionamento entre Ticket e Analista
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.Analista)
-                .WithMany(u => u.TicketsAnalista)
                 .HasForeignKey(t => t.AnalistaId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // Configurar relacionamento entre Ticket e Destinatario
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.Destinatario)
-                .WithMany(u => u.TicketsDestinatarios)
-                .HasForeignKey(t => t.DestinatarioId)
-                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<UsuarioAnalista>()
+                .HasMany(u => u.UsuarioEspecialidades)
+                .WithOne(ue => ue.Analista)
+                .HasForeignKey(ue => ue.AnalistaId);
 
+            modelBuilder.Entity<UsuarioSolicitante>()
+                .HasMany(u => u.Solicitacoes)
+                .WithOne(t => t.Solicitante)
+                .HasForeignKey(t => t.SolicitanteId);
+             
             base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<UsuarioAnalista> Solicitantes { get; set; }
+        public DbSet<UsuarioSolicitante> Analistas { get; set; }
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Anexo> Anexos { get; set; }
         public DbSet<Especialidade> Especialidades { get; set; }

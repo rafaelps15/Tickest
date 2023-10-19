@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tickest.Data;
 
@@ -11,9 +12,11 @@ using Tickest.Data;
 namespace Tickest.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20231019000636_Ajuste-Departamento")]
+    partial class AjusteDepartamento
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,11 +72,11 @@ namespace Tickest.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Area")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("DepartamentoId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Nome")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -106,7 +109,7 @@ namespace Tickest.Migrations
                     b.Property<int>("AbertoPorId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AnalistaId")
+                    b.Property<int>("AnalistaId")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("Anexo")
@@ -140,7 +143,7 @@ namespace Tickest.Migrations
                     b.Property<int>("TicketStatus")
                         .HasColumnType("int");
 
-                    b.Property<string>("Titulo")
+                    b.Property<string>("Título")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -286,7 +289,8 @@ namespace Tickest.Migrations
                     b.HasOne("Tickest.Models.Entidades.Usuarios.UsuarioAnalista", "Analista")
                         .WithMany("TicketResponsaveis")
                         .HasForeignKey("AnalistaId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Tickest.Models.Entidades.Departamento", "Departamento")
                         .WithMany()

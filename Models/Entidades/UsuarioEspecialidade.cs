@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
+using Tickest.Models.Entidades.Usuarios;
 
 namespace Tickest.Models.Entidades
 {
@@ -10,11 +7,11 @@ namespace Tickest.Models.Entidades
     {
         [Key]
         public int Id { get; set; }
-        public Usuario Usuario { get; set; }
-        public int UsuarioId { get; set; }
+
+        public UsuarioAnalista Analista { get; set; }
+        public int AnalistaId { get; set; }
 
         public Especialidade Especialidade { get; set; }
-
         public int EspecialidadeId { get; set; }
     }
 }

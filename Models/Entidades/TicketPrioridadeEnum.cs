@@ -1,12 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.ComponentModel;
 
 namespace Tickest.Models.Entidades
 {
     public enum TicketPrioridadeEnum
     {
-        Baixa, Normal, Urgente
+        [Description("Baixa")]
+        Baixa = 1,
+
+        [Description("Normal")]
+        Normal = 2,
+
+        [Description("Urgente")]
+        Urgente = 3
     }
 }

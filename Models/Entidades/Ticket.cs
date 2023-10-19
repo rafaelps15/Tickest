@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using Tickest.Models.Entidades.Usuarios;
 
 namespace Tickest.Models.Entidades
 {
@@ -13,32 +14,34 @@ namespace Tickest.Models.Entidades
         public int Id { get; set; }
         [Required]
         [StringLength(100)]
-        public string Título { get; set; }
+        public string Titulo { get; set; }
 
         [Required]
-        public DateTime DataCriação { get; set; }
+        public DateTime DataCriacao { get; set; }
         public DateTime DataLimite { get; set; }
+        //public DateTime DataMinima { get; set; }
 
         [Required]
         [StringLength(500)]
-        public string Descrição { get; set; }
+        public string Descricao { get; set; }
         [Required]
         [StringLength(500)]
         public string Comentario { get; set; }
-        public string Anexo { get; set; }
-
+        public byte[] Anexo { get; set; }
         public TicketPrioridadeEnum Prioridade { get; set; }
         public TicketStatus TicketStatus { get; set; }
 
         public int SolicitanteId { get; set; }
-        public Usuario Solicitante { get; set; }
+        public UsuarioSolicitante Solicitante { get; set; }
 
-        public int AnalistaId { get; set; }
-        public Usuario Analista { get; set; }
+        public int? AnalistaId { get; set; }
+        public UsuarioAnalista Analista { get; set; }
 
-        public int DestinatarioId { get; set; }
-        public Usuario Destinatario { get; set; }
+        public int AbertoPorId { get; set; }
+        public UsuarioAnalista AbertoPor { get; set; }
 
+        public int DepartamentoId { get; set; }
+        public Departamento Departamento { get; set; }
 
         /* Criei uma classe tipo Enum -> Mostrar para o Cristo
         public enum Prioridade

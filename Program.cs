@@ -34,7 +34,7 @@ namespace Tickest
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Ticket}/{action=Cadastrar}/{id?}");
+                pattern: "{controller=Ticket}/{action=Form}/{id?}");
 
             app.Run();
 

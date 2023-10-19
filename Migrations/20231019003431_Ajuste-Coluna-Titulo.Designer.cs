@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tickest.Data;
 
@@ -11,9 +12,11 @@ using Tickest.Data;
 namespace Tickest.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20231019003431_Ajuste-Coluna-Titulo")]
+    partial class AjusteColunaTitulo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,7 +109,7 @@ namespace Tickest.Migrations
                     b.Property<int>("AbertoPorId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AnalistaId")
+                    b.Property<int>("AnalistaId")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("Anexo")
@@ -286,7 +289,8 @@ namespace Tickest.Migrations
                     b.HasOne("Tickest.Models.Entidades.Usuarios.UsuarioAnalista", "Analista")
                         .WithMany("TicketResponsaveis")
                         .HasForeignKey("AnalistaId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Tickest.Models.Entidades.Departamento", "Departamento")
                         .WithMany()
