@@ -2,8 +2,9 @@
 @model TicketViewModel
 
 @{
-    Layout = "_Layout";  // Especifica o layout a ser usado para esta página
+    Layout = "_Layout"; // Specify the layout to be used for this page
 }
+
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <!-- Menu -->
@@ -19,113 +20,66 @@
                         <!-- Basic -->
                         <div class="col-md-6">
                             <div class="card mb-4">
-
-                                @using (Html.BeginForm("Form", "Ticket", FormMethod.Post))
+                                @using (Html.BeginForm("Form", "Ticket", FormMethod.Post, new { enctype = "multipart/form-data" }))
                                 {
-                                    <h5 class="card-header">Ticket</h5>
+                                    <h5 class="card-header">Crie um Ticket</h5>
                                     <div class="card-body demo-vertical-spacing demo-only-element">
-                                        <label class="form-label" asp-for="Titulo">Título:</label>
-                                        <input asp-for="Titulo" placeholder="Digite o título do ticket" aria-label="Titulo" aria-describedby="basic-addon11" class="form-control" />
-                                        <span asp-validation-for="Titulo" class="text-danger"></span>
-
-                                       @* <label class="form-label" asp-for="DataMinima">Data Mínima</label>
-                                        <input type="date" asp-for="DataMinima" min="@DateTime.Now.ToShortDateString()" max="@DateTime.Now.AddDays(2).ToShortDateString()" placeholder="DataLimite" aria-label="DataLimite" aria-describedby="basic-addon11" class="form-control" />
-                                        <span asp-validation-for="DataMinima" class="text-danger"></span>
-                                       *@
-                                        <label class="form-label" asp-for="DataLimite">Data limite</label>
-                                        <input type="date" asp-for="DataLimite" min="@DateTime.Now.ToShortDateString()" max="@DateTime.Now.AddDays(5).ToShortDateString()" placeholder="DataLimite" aria-label="DataLimite" aria-describedby="basic-addon11" class="form-control" />
-                                        <span asp-validation-for="DataLimite" class="text-danger"></span>
-
-
-                                        <label class="form-label" asp-for="TicketPrioridadeSelecionado" for="basic-default-password12">Prioridade</label>
-                                        <div class="input-group">
-                                            <div class="input-group">
-                                                @Html.DropDownListFor(model => model.TicketPrioridadeSelecionado, new SelectList(Model.TicketPrioridades, "Valor", "Descricao"), "Selecione um item",  new { @class = "form-select" })
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="Titulo">Título:</label>
+                                            <input type="text" asp-for="Titulo" class="form-control" placeholder="Descreva o título do ticket, por exemplo: 'Problema com o servidor'" />
+                                            <span asp-validation-for="Titulo" class="text-danger"></span>
                                         </div>
 
-                                        <label class="form-label" asp-for="Descricao">Descrição:</label>
-                                        <input asp-for="Descricao" placeholder=" Escreva uma descrição interna sobre este campo" aria-label="Descricao" aria-describedby="basic-addon11" class="form-control" />
-                                        <span asp-validation-for="Descricao" class="text-danger"></span>
-
-                                        <label class="form-label" asp-for="DepartamentoSelectionado" for="basic-default-password12">Departamento</label>
-                                        <div class="input-group">
-                                            <div class="input-group">
-                                                @Html.DropDownListFor(model => model.DepartamentoSelectionado, new SelectList(Model.Departamentos, "Id", "Nome"), "Selecione um item",  new { @class = "form-select" })
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="DataLimite">Data limite:</label>
+                                            <input type="date" asp-for="DataLimite" min="@DateTime.Now.ToShortDateString()" max="@DateTime.Now.AddDays(5).ToShortDateString()" class="form-control" />
+                                            <span asp-validation-for="DataLimite" class="text-danger"></span>
                                         </div>
 
-                                        <label class="form-label" asp-for="Solicitante">Solicitante:</label>
-                                        <input asp-for="Solicitante" placeholder="Digite o nome do solicitante" aria-label="Solicitante" aria-describedby="basic-addon11" class="form-control" />
-                                        <span asp-validation-for="Solicitante" class="text-danger"></span>
+                                        <div class="form-group">
+                                            <label for="TicketPrioridadeSelecionado">Prioridade:</label>
+                                            @Html.DropDownListFor(model => model.TicketPrioridadeSelecionado, new SelectList(Model.TicketPrioridades, "Valor", "Descricao"), "Selecione uma prioridade", new { @class = "form-control" })
+                                        </div>
 
-                                        @*  <label class="form-label" asp-for="Comentario">Comentario:</label>
-                                    <input asp-for="Comentario" placeholder="Comentario" aria-label="Comentario" aria-describedby="basic-addon11" class="form-control" />
-                                    <span asp-validation-for="Comentario" class="text-danger"></span>
-                                    *@
+                                        <div class="form-group">
+                                            <label for="Descricao">Descrição:</label>
+                                            <textarea id="Descricao" name="Descricao" class="form-control" placeholder="Forneça uma descrição detalhada do ticket, incluindo informações relevantes" required></textarea>
+                                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                                        </div>
 
-                                        <label class="form-label" asp-for="Anexo">Anexo:</label>
-                                        <input asp-for="Anexo" placeholder="Fotos e Vídeos, Documento, Contato" aria-label="Anexo" aria-describedby="basic-addon11" class="form-control" />
-                                        <span asp-validation-for="Anexo" class="text-danger"></span>
+                                        <div class="form-group">
+                                            <label for="DepartamentoSelectionado">Departamento:</label>
+                                            @Html.DropDownListFor(model => model.DepartamentoSelectionado, new SelectList(Model.Departamentos, "Id", "Nome"), "Selecione o departamento responsável pelo ticket", new { @class = "form-control" })
+                                        </div>
 
-                                        @* <label class="form-label" for="basic-default-password12">Área</label>
-                                    <div class="input-group">
-                                    <div class="input-group">
-                                    <select class="form-select" id="inputGroupSelect02">
-                                    <option selected>Escolha...</option>
-                                    <option value="1">Área1</option>
-                                    <option value="2">Área2</option>
-                                    <option value="3">Área3</option>
-                                    </select>
-                                    </div>
-                                    </div>
-                                    <div class="mb-3">
-                                    <label for="formFileMultiple" class="form-label">Anexos</label>
-                                    <input class="form-control" type="file" id="formFileMultiple" multiple />
-                                    </div>*@
-                                        <button type="submit" class="btn btn-primary mt-3">Enviar</button>
+                                        <div class="form-group">
+                                            <label for="Solicitante">Solicitante:</label>
+                                            <input type="text" asp-for="Solicitante" class="form-control" placeholder="Informe o nome da pessoa que está solicitando assistência" />
+                                            <span asp-validation-for="Solicitante" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="Anexo">Anexo:</label>
+                                            <input type="file" asp-for="Anexo" class="form-control" placeholder="Adicione anexos, como fotos, vídeos, documentos ou informações de contato" />
+                                            <span asp-validation-for="Anexo" class="text-danger"></span>
+                                        </div>
+
+                                            <button type="submit" value="Form" class="btn btn-primary mt-3">Enviar</button>
                                     </div>
                                 }
-
                             </div>
                         </div>
                     </div>
                     <!-- Footer -->
-                    <footer class="content-footer footer bg-footer-theme">
-                        <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
-                            <div class="mb-2 mb-md-0">
-                                ©
-                                <script>
-                                    document.write(new Date().getFullYear());
-                                </script>
-                                , made with ❤️ by
-                                <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
-                            </div>
-                            <div>
-                                <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
-                                <a href="https://themeselection.com/" target="_blank" class="footer-link me-4">More Themes</a>
-
-                                <a href="https://themeselection.com/demo/sneat-bootstrap-html-admin-template/documentation/"
-                                   target="_blank"
-                                   class="footer-link me-4">Documentation</a>
-
-                                <a href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
-                                   target="_blank"
-                                   class="footer-link me-4">Support</a>
-                            </div>
-                        </div>
+                    <footer class="text-center py-3">
+                        <p>&copy; <script>document.write(new Date().getFullYear())</script> RCV Tech. Todos os direitos reservados.</p>
                     </footer>
                     <!-- / Footer -->
-
                     <div class="content-backdrop fade"></div>
                 </div>
-                <!-- Content wrapper -->
             </div>
-            <!-- / Layout page -->
         </div>
-
         <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
 </div>
-

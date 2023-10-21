@@ -2,7 +2,7 @@
 
 namespace Tickest.Models.Entidades.Usuarios
 {
-    public abstract class Usuario
+    public class Usuario
     {
         [Key]
         public int Id { get; set; }
@@ -13,7 +13,21 @@ namespace Tickest.Models.Entidades.Usuarios
         public string Email { get; set; }
 
         [Required]
-        [StringLength(250)]
+        [StringLength(20)]
         public string Senha { get; set; }
+
+        public DateTime DataCadastro { get; set; }
+
+        public ICollection<TicketMensagem> TicketMensagens { get; set; }
+
+        public ICollection<UsuarioRegraMapeamento> UsuarioRegraMapeamento { get; set; }
+
+        public ICollection<Ticket> AberturaTickets { get; set; }
+
+        public ICollection<Ticket> TicketResponsaveis { get; set; }
+        public ICollection<UsuarioEspecialidade> UsuarioEspecialidades { get; set; }
+
+        public ICollection<Ticket> Solicitacoes { get; set; }
+
     }
 }

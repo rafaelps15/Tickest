@@ -37,17 +37,16 @@ namespace Tickest.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TicketFases",
+                name: "UsuarioRegras",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Ordem = table.Column<int>(type: "int", nullable: false)
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TicketFases", x => x.Id);
+                    table.PrimaryKey("PK_UsuarioRegras", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -56,7 +55,7 @@ namespace Tickest.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Area = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DepartamentoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -71,29 +70,23 @@ namespace Tickest.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Usuarios",
+                name: "Usuario",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Senha = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DepartamentoId = table.Column<int>(type: "int", nullable: true),
-                    DepartamentoId1 = table.Column<int>(type: "int", nullable: true)
+                    Senha = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    DataCadastro = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DepartamentoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Usuarios", x => x.Id);
+                    table.PrimaryKey("PK_Usuario", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Usuarios_Departamentos_DepartamentoId",
+                        name: "FK_Usuario_Departamentos_DepartamentoId",
                         column: x => x.DepartamentoId,
-                        principalTable: "Departamentos",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Usuarios_Departamentos_DepartamentoId1",
-                        column: x => x.DepartamentoId1,
                         principalTable: "Departamentos",
                         principalColumn: "Id");
                 });
@@ -104,16 +97,15 @@ namespace Tickest.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Título = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Titulo = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DataLimite = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Descricao = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Comentario = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Anexo = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Prioridade = table.Column<int>(type: "int", nullable: false),
                     TicketStatus = table.Column<int>(type: "int", nullable: false),
                     SolicitanteId = table.Column<int>(type: "int", nullable: false),
-                    AnalistaId = table.Column<int>(type: "int", nullable: false),
+                    AnalistaId = table.Column<int>(type: "int", nullable: true),
                     AbertoPorId = table.Column<int>(type: "int", nullable: false),
                     DepartamentoId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -127,19 +119,19 @@ namespace Tickest.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Tickets_Usuarios_AbertoPorId",
+                        name: "FK_Tickets_Usuario_AbertoPorId",
                         column: x => x.AbertoPorId,
-                        principalTable: "Usuarios",
+                        principalTable: "Usuario",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Tickets_Usuarios_AnalistaId",
+                        name: "FK_Tickets_Usuario_AnalistaId",
                         column: x => x.AnalistaId,
-                        principalTable: "Usuarios",
+                        principalTable: "Usuario",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Tickets_Usuarios_SolicitanteId",
+                        name: "FK_Tickets_Usuario_SolicitanteId",
                         column: x => x.SolicitanteId,
-                        principalTable: "Usuarios",
+                        principalTable: "Usuario",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -163,10 +155,36 @@ namespace Tickest.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UsuarioEspecialidades_Usuarios_AnalistaId",
+                        name: "FK_UsuarioEspecialidades_Usuario_AnalistaId",
                         column: x => x.AnalistaId,
-                        principalTable: "Usuarios",
+                        principalTable: "Usuario",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UsuarioRegraMapeamentos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UsuarioId = table.Column<int>(type: "int", nullable: false),
+                    UsuarioRegraId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UsuarioRegraMapeamentos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UsuarioRegraMapeamentos_UsuarioRegras_UsuarioRegraId",
+                        column: x => x.UsuarioRegraId,
+                        principalTable: "UsuarioRegras",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UsuarioRegraMapeamentos_Usuario_UsuarioId",
+                        column: x => x.UsuarioId,
+                        principalTable: "Usuario",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -189,6 +207,34 @@ namespace Tickest.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TicketMensagem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DataMensagem = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Mensagem = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UsuarioId = table.Column<int>(type: "int", nullable: false),
+                    TicketId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TicketMensagem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TicketMensagem_Tickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "Tickets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TicketMensagem_Usuario_UsuarioId",
+                        column: x => x.UsuarioId,
+                        principalTable: "Usuario",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Anexos_TicketId",
                 table: "Anexos",
@@ -198,6 +244,16 @@ namespace Tickest.Migrations
                 name: "IX_Especialidades_DepartamentoId",
                 table: "Especialidades",
                 column: "DepartamentoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TicketMensagem_TicketId",
+                table: "TicketMensagem",
+                column: "TicketId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TicketMensagem_UsuarioId",
+                table: "TicketMensagem",
+                column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_AbertoPorId",
@@ -220,6 +276,11 @@ namespace Tickest.Migrations
                 column: "SolicitanteId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Usuario_DepartamentoId",
+                table: "Usuario",
+                column: "DepartamentoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UsuarioEspecialidades_AnalistaId",
                 table: "UsuarioEspecialidades",
                 column: "AnalistaId");
@@ -230,14 +291,14 @@ namespace Tickest.Migrations
                 column: "EspecialidadeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Usuarios_DepartamentoId",
-                table: "Usuarios",
-                column: "DepartamentoId");
+                name: "IX_UsuarioRegraMapeamentos_UsuarioId",
+                table: "UsuarioRegraMapeamentos",
+                column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Usuarios_DepartamentoId1",
-                table: "Usuarios",
-                column: "DepartamentoId1");
+                name: "IX_UsuarioRegraMapeamentos_UsuarioRegraId",
+                table: "UsuarioRegraMapeamentos",
+                column: "UsuarioRegraId");
         }
 
         /// <inheritdoc />
@@ -250,10 +311,13 @@ namespace Tickest.Migrations
                 name: "Notificacoes");
 
             migrationBuilder.DropTable(
-                name: "TicketFases");
+                name: "TicketMensagem");
 
             migrationBuilder.DropTable(
                 name: "UsuarioEspecialidades");
+
+            migrationBuilder.DropTable(
+                name: "UsuarioRegraMapeamentos");
 
             migrationBuilder.DropTable(
                 name: "Tickets");
@@ -262,7 +326,10 @@ namespace Tickest.Migrations
                 name: "Especialidades");
 
             migrationBuilder.DropTable(
-                name: "Usuarios");
+                name: "UsuarioRegras");
+
+            migrationBuilder.DropTable(
+                name: "Usuario");
 
             migrationBuilder.DropTable(
                 name: "Departamentos");

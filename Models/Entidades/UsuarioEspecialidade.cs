@@ -8,7 +8,7 @@ namespace Tickest.Models.Entidades
         [Key]
         public int Id { get; set; }
 
-        public UsuarioAnalista Analista { get; set; }
+        public Usuario Analista { get; set; }
         public int AnalistaId { get; set; }
 
         public Especialidade Especialidade { get; set; }

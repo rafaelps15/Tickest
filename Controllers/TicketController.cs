@@ -1,30 +1,42 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Tickest.Data;
 using Tickest.Extensions;
 using Tickest.Models.Entidades;
 using Tickest.Models.Entidades.Usuarios;
+using Tickest.Models.Regras;
 using Tickest.Models.ViewModels;
 
 namespace Tickest.Controllers
 {
-    public class TicketController : Controller
+    [Authorize(Roles = "administrador")]
+    public class TicketController : BaseController
     {
-        private readonly Contexto _context;
-
-        public TicketController(Contexto context)
+        public TicketController(Contexto context, IHttpContextAccessor httpContextAccessor) : base(context, httpContextAccessor)
         {
-            this._context = context;
         }
 
         #region SEED
 
         private void Seed()
         {
-            var solicitante = new UsuarioSolicitante()
+            var colaboradorRegra = _context.Set<UsuarioRegra>().FirstOrDefault(p => p.Nome == UsuarioRegraDefault.Colaborador);
+            var analistaRegra = _context.Set<UsuarioRegra>().FirstOrDefault(p => p.Nome == UsuarioRegraDefault.Analista);
+            var administradorRegra = _context.Set<UsuarioRegra>().FirstOrDefault(p => p.Nome == UsuarioRegraDefault.Administrador);
+
+            var colaborador = new Usuario()
             {
                 Nome = "Maria",
                 Email = "maria@gmail.com",
                 Senha = "123",
+                UsuarioRegraMapeamento = new List<UsuarioRegraMapeamento>()
+                {
+                    new UsuarioRegraMapeamento
+                    {
+                        UsuarioRegra = colaboradorRegra
+                    } 
+                }
             };
 
             var departamento = new Departamento
@@ -46,13 +58,20 @@ namespace Tickest.Controllers
                 Nome = "Infra"
             };
 
-            var analistas = new List<UsuarioAnalista>()
+            var analistas = new List<Usuario>()
             {
-                new UsuarioAnalista
+                new Usuario
                 {
                     Nome = "Gabriel",
                     Email = "gabriel@gmail.com",
                     Senha = "123",
+                    UsuarioRegraMapeamento = new List<UsuarioRegraMapeamento>()
+                    {
+                        new UsuarioRegraMapeamento
+                        {
+                            UsuarioRegra = analistaRegra
+                        }
+                    },
                     UsuarioEspecialidades = new List<UsuarioEspecialidade>
                     {
                         new UsuarioEspecialidade
@@ -62,11 +81,22 @@ namespace Tickest.Controllers
                     }
                 },
 
-                new UsuarioAnalista
+                new Usuario
                 {
                     Nome = "Rafael",
                     Email = "rafaell@gmail.com",
                     Senha = "123",
+                     UsuarioRegraMapeamento = new List<UsuarioRegraMapeamento>()
+                     {
+                         new UsuarioRegraMapeamento
+                         {
+                             UsuarioRegra = analistaRegra
+                         },
+                         new UsuarioRegraMapeamento
+                         {
+                             UsuarioRegra = administradorRegra
+                         }
+                     },
                     UsuarioEspecialidades = new List<UsuarioEspecialidade>
                     {
                         new UsuarioEspecialidade
@@ -81,7 +111,7 @@ namespace Tickest.Controllers
                 }
             };
 
-            _context.Add(solicitante);
+            _context.Add(colaborador);
             _context.Add(departamento);
             _context.Add(sistemas);
             _context.Add(infra);
@@ -90,12 +120,12 @@ namespace Tickest.Controllers
             _context.SaveChanges();
         }
 
-        #endregion
+        #endregion 
 
         [HttpGet]
         public IActionResult Form(int? id)
         {
-            //CARREGAR A TELA
+            //CARREGAR A TELA 
 
             var model = new TicketViewModel
             {
@@ -121,8 +151,27 @@ namespace Tickest.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult Listagem()
+        {
+            //Verificar quais tickets estão abertos e apresentar na tela
+            List<TicketViewModel> viewModels = _context.Set<Ticket>()
+                .Where(p => p.TicketStatus == TicketStatus.Aberto)
+                .Select(p => new TicketViewModel
+                {
+                    //Adicionar o que for necessário para apresentar o Ticket
+                    Titulo = p.Titulo,
+                    Descricao = p.Descricao,
+                    DataLimite = p.DataLimite,
+                    DepartamentoSelectionado = p.DepartamentoId,
+                                 
+                }).ToList();
+
+            return View(viewModels);
+        }
+
         [HttpPost]
-        public IActionResult Form(TicketViewModel request)
+        public async Task<IActionResult> Form(TicketViewModel request)
         {
             // ENVIA DADOS TELA
 
@@ -135,12 +184,21 @@ namespace Tickest.Controllers
             if (request.DataLimite < hoje || request.DataLimite > hoje.AddDays(5))
                 ModelState.AddModelError(nameof(TicketViewModel.DataLimite), "A data limite não pode pode ser menor do que hoje e maior do que cinco dias.");
 
-            var solicitante = _context.Set<UsuarioSolicitante>().FirstOrDefault(p => p.Email == request.Solicitante);
+            var solicitante = _context.Set<Usuario>().FirstOrDefault(p => p.Email == request.Solicitante);
             if (solicitante == null)
                 ModelState.AddModelError(nameof(TicketViewModel.Solicitante), "Solicitante não encontrado");
 
             if (!ModelState.IsValid)
                 return View(request);
+            byte[] arquivo = null;
+            if (request.Anexo != null && request.Anexo.Length > 0)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    request.Anexo.CopyTo(stream);
+                    arquivo = stream.ToArray();
+                }
+            }
 
             // SE PASSOU DESSE IF QUER DIZER QUE ESTÁ VÁLIDO
 
@@ -148,14 +206,14 @@ namespace Tickest.Controllers
             var entidade = new Ticket();
             entidade.Titulo = request.Titulo;
             entidade.DataLimite = request.DataLimite;
+            entidade.Prioridade = request.TicketPrioridadeSelecionado.Value;
             entidade.DepartamentoId = request.DepartamentoSelectionado;
-            entidade.Anexo = request.Anexo;
+            entidade.Anexo = arquivo;
             entidade.Descricao = request.Descricao;
             entidade.TicketStatus = TicketStatus.Aberto;
             entidade.SolicitanteId = solicitante.Id;
-            entidade.Comentario = string.Empty;
             entidade.DataCriacao = DateTime.Now;
-            entidade.AbertoPorId = 4; //USUARIO LOGADO
+            entidade.AbertoPorId = (await ObterUsuarioLogado()).Id;
 
 
             //Salvar no banco
@@ -165,5 +223,7 @@ namespace Tickest.Controllers
 
             return View(request);
         }
+
+     
     }
 }

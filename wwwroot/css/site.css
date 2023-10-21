@@ -20,3 +20,25 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Estilização da tabela */
+#dataGrid {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+    #dataGrid th, #dataGrid td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    #dataGrid th {
+        background-color: #f2f2f2;
+    }
+
+    /* Estilização das linhas alternadas */
+    #dataGrid tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }

@@ -1,0 +1,52 @@
+﻿@using Tickest.Models.ViewModels;
+@model IEnumerable<TicketViewModel>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Listagem de Tickets</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Listagem de Tickets</h1>
+        <table id="dataGrid" class="display">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Descrição</th>
+                    <th>Data Limite</th>
+                    <th>Departamento Responsável</th>
+                    <!-- Adicione mais colunas conforme necessário -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Titulo</td>
+                        <td>@item.Descricao</td>
+                        <td>@item.DataLimite.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                        <td>@item.DepartamentoSelectionado</td>
+                        <!-- Preencha as células da tabela com os dados do seu modelo -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#dataGrid').DataTable({
+                "paging": true, // Ativar paginação
+                "ordering": true, // Ativar ordenação nas colunas
+            });
+        });
+    </script>
+
+</body>
+</html>

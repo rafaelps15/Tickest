@@ -1,8 +1,6 @@
-using FluentAssertions.Common;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ServiceStack.Text;
 using Tickest.Data;
+using Tickest.Data.Seed;
 
 namespace Tickest
 {
@@ -14,7 +12,25 @@ namespace Tickest
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddHttpContextAccessor();
+
+            var authentication = builder.Services.AddAuthentication(opt =>
+            {
+                opt.DefaultChallengeScheme = "Authentication";
+                opt.DefaultScheme = "Authentication";
+            });
+
+            authentication.AddCookie("Authentication", opt =>
+            {
+                opt.Cookie.HttpOnly = true;
+                opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                opt.LoginPath = new PathString("/login");
+                opt.AccessDeniedPath = new PathString("/acesso-negado");
+                opt.ExpireTimeSpan = TimeSpan.FromDays(10);
+            });
+
             builder.Services.AddDbContext<Contexto>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            SeedData.Initialize(builder.Services.BuildServiceProvider());
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -40,4 +56,8 @@ namespace Tickest
 
         }
     }
+
+   
+
+
 }

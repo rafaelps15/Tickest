@@ -1,44 +1,52 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Tickest.Data;
+using Tickest.Models.Entidades.Usuarios;
 using Tickest.Models.ViewModels;
-
 
 namespace Tickest.Controllers
 {
-    public class UsuarioController : Controller
+    public class UsuarioController : BaseController
     {
-        private readonly Contexto db;
-        public UsuarioController(Contexto db)
+        public UsuarioController(Contexto context, IHttpContextAccessor httpContextAccessor) : base(context, httpContextAccessor)
         {
-            this.db = db;
         }
 
         [HttpGet]
         public IActionResult Cadastrar()
         {
+            //Aguardando a tela
+
             return View();
         }
 
         [HttpPost]
-        public IActionResult ProcessarCadastro([FromForm] UsuarioViewModel viewModel)
+        public IActionResult Cadastrar([FromForm] UsuarioViewModel viewModel)
         {
-            // Aqui você pode processar os dados do formulário
-            if (ModelState.IsValid)
+            bool usuarioExistente = _context.Set<Usuario>().Any(u => u.Email == viewModel.Email);
+
+            if (usuarioExistente)
             {
-                // O modelo é válido, você pode prosseguir com o processamento
-                // por exemplo, salvar os dados no banco de dados
-                // e redirecionar para outra página
-                return RedirectToAction("Sucesso");
+                ModelState.AddModelError(nameof(UsuarioViewModel.Email), "Já existe um usuário com o mesmo Email.");
+                return View(viewModel);
             }
-            else
-            {
-                // O modelo não é válido, retorne a mesma página com erros
-                return View("Cadastrar", viewModel);
-            }
+
+            //var novoUsuario = new Usuario
+            //{
+            //    Nome = viewModel.Nome,
+            //    Email = viewModel.Email,
+            //    Senha = viewModel.Senha
+            //};
+
+            //_context.Set<Usuario>().Add(novoUsuario);
+            //_context.SaveChanges();
+
+            //Redirecionar para a próxima página.
+            return RedirectToAction("");
         }
 
         [HttpGet]
-        public IActionResult Sucesso()
+        [HttpGet]
+        public IActionResult CadastradoSucesso()
         {
             // Página de sucesso após o cadastro
             return View();

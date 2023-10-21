@@ -112,11 +112,6 @@ namespace Tickest.Migrations
                     b.Property<byte[]>("Anexo")
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("Comentario")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
@@ -158,7 +153,7 @@ namespace Tickest.Migrations
                     b.ToTable("Tickets");
                 });
 
-            modelBuilder.Entity("Tickest.Models.Entidades.TicketFase", b =>
+            modelBuilder.Entity("Tickest.Models.Entidades.TicketMensagem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -166,15 +161,25 @@ namespace Tickest.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Nome")
+                    b.Property<DateTime>("DataMensagem")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Mensagem")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Ordem")
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TicketFases");
+                    b.HasIndex("TicketId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("TicketMensagem");
                 });
 
             modelBuilder.Entity("Tickest.Models.Entidades.UsuarioEspecialidade", b =>
@@ -208,9 +213,11 @@ namespace Tickest.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DepartamentoId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -222,35 +229,53 @@ namespace Tickest.Migrations
 
                     b.Property<string>("Senha")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuarios");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Usuario");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioAnalista", b =>
-                {
-                    b.HasBaseType("Tickest.Models.Entidades.Usuarios.Usuario");
-
-                    b.Property<int?>("DepartamentoId")
-                        .HasColumnType("int");
-
                     b.HasIndex("DepartamentoId");
 
-                    b.HasDiscriminator().HasValue("UsuarioAnalista");
+                    b.ToTable("Usuario");
                 });
 
-            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioSolicitante", b =>
+            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioRegra", b =>
                 {
-                    b.HasBaseType("Tickest.Models.Entidades.Usuarios.Usuario");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.HasDiscriminator().HasValue("UsuarioSolicitante");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UsuarioRegras");
+                });
+
+            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioRegraMapeamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioRegraId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.HasIndex("UsuarioRegraId");
+
+                    b.ToTable("UsuarioRegraMapeamentos");
                 });
 
             modelBuilder.Entity("Tickest.Models.Entidades.Anexo", b =>
@@ -277,13 +302,13 @@ namespace Tickest.Migrations
 
             modelBuilder.Entity("Tickest.Models.Entidades.Ticket", b =>
                 {
-                    b.HasOne("Tickest.Models.Entidades.Usuarios.UsuarioAnalista", "AbertoPor")
+                    b.HasOne("Tickest.Models.Entidades.Usuarios.Usuario", "AbertoPor")
                         .WithMany("AberturaTickets")
                         .HasForeignKey("AbertoPorId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Tickest.Models.Entidades.Usuarios.UsuarioAnalista", "Analista")
+                    b.HasOne("Tickest.Models.Entidades.Usuarios.Usuario", "Analista")
                         .WithMany("TicketResponsaveis")
                         .HasForeignKey("AnalistaId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -294,7 +319,7 @@ namespace Tickest.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Tickest.Models.Entidades.Usuarios.UsuarioSolicitante", "Solicitante")
+                    b.HasOne("Tickest.Models.Entidades.Usuarios.Usuario", "Solicitante")
                         .WithMany("Solicitacoes")
                         .HasForeignKey("SolicitanteId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -309,9 +334,28 @@ namespace Tickest.Migrations
                     b.Navigation("Solicitante");
                 });
 
+            modelBuilder.Entity("Tickest.Models.Entidades.TicketMensagem", b =>
+                {
+                    b.HasOne("Tickest.Models.Entidades.Ticket", "Ticket")
+                        .WithMany("Mensagens")
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Tickest.Models.Entidades.Usuarios.Usuario", "Usuario")
+                        .WithMany("TicketMensagens")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("Tickest.Models.Entidades.UsuarioEspecialidade", b =>
                 {
-                    b.HasOne("Tickest.Models.Entidades.Usuarios.UsuarioAnalista", "Analista")
+                    b.HasOne("Tickest.Models.Entidades.Usuarios.Usuario", "Analista")
                         .WithMany("UsuarioEspecialidades")
                         .HasForeignKey("AnalistaId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -328,11 +372,30 @@ namespace Tickest.Migrations
                     b.Navigation("Especialidade");
                 });
 
-            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioAnalista", b =>
+            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.Usuario", b =>
                 {
                     b.HasOne("Tickest.Models.Entidades.Departamento", null)
                         .WithMany("Analistas")
                         .HasForeignKey("DepartamentoId");
+                });
+
+            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioRegraMapeamento", b =>
+                {
+                    b.HasOne("Tickest.Models.Entidades.Usuarios.Usuario", "usuario")
+                        .WithMany("usuarioRegras")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tickest.Models.Entidades.Usuarios.UsuarioRegra", "UsuarioRegra")
+                        .WithMany("usuarioRegras")
+                        .HasForeignKey("UsuarioRegraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UsuarioRegra");
+
+                    b.Navigation("usuario");
                 });
 
             modelBuilder.Entity("Tickest.Models.Entidades.Departamento", b =>
@@ -347,18 +410,29 @@ namespace Tickest.Migrations
                     b.Navigation("UsuarioEspecialidades");
                 });
 
-            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioAnalista", b =>
+            modelBuilder.Entity("Tickest.Models.Entidades.Ticket", b =>
+                {
+                    b.Navigation("Mensagens");
+                });
+
+            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.Usuario", b =>
                 {
                     b.Navigation("AberturaTickets");
+
+                    b.Navigation("Solicitacoes");
+
+                    b.Navigation("TicketMensagens");
 
                     b.Navigation("TicketResponsaveis");
 
                     b.Navigation("UsuarioEspecialidades");
+
+                    b.Navigation("usuarioRegras");
                 });
 
-            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioSolicitante", b =>
+            modelBuilder.Entity("Tickest.Models.Entidades.Usuarios.UsuarioRegra", b =>
                 {
-                    b.Navigation("Solicitacoes");
+                    b.Navigation("usuarioRegras");
                 });
 #pragma warning restore 612, 618
         }
