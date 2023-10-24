@@ -19,7 +19,7 @@ namespace Tickest.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<LoginResultado> Login(string email, string senha)
+        public async Task<LoginResultado> SignIn(string email, string senha)
         {
             var resultado = new LoginResultado();
 
@@ -59,6 +59,11 @@ namespace Tickest.Controllers
             await _httpContextAccessor.HttpContext.SignInAsync("Authentication", userPrincipal, authProperties);
 
             return resultado;
+        }
+
+        public async Task SignOutAsync()
+        {
+            await _httpContextAccessor.HttpContext.SignOutAsync("Authentication");
         }
 
         public async Task<Usuario> ObterUsuarioLogado()

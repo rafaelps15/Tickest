@@ -21,11 +21,5 @@ namespace Tickest.Models.ViewModels
         [Compare("Senha", ErrorMessage = "As senhas não coincidem.")]
         public string ConfirmacaoSenha { get; set; }
 
-        // Outras propriedades relevantes para o usuário, como data de nascimento, endereço, etc.
-
-        // Você também pode adicionar propriedades para informações adicionais, se necessário.
-
-        // Exemplo de propriedade para um papel de usuário (para controle de acesso):
-        //public List<string> Papel { get; set; }
     }
 }

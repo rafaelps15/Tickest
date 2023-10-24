@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using Tickest.Data;
 using Tickest.Models.Entidades.Usuarios;
 using Tickest.Models.ViewModels;
@@ -15,41 +16,33 @@ namespace Tickest.Controllers
         public IActionResult Cadastrar()
         {
             //Aguardando a tela
-
-            return View();
+            var viewModel = new UsuarioViewModel(); 
+            return View(viewModel); // Retorne a View de cadastro com o ViewModel
         }
 
         [HttpPost]
-        public IActionResult Cadastrar([FromForm] UsuarioViewModel viewModel)
+        public IActionResult Cadastrar([FromForm] UsuarioViewModel request)
         {
-            bool usuarioExistente = _context.Set<Usuario>().Any(u => u.Email == viewModel.Email);
+            bool usuarioExistente = _context.Set<Usuario>().Any(u => u.Email == request.Email);
 
             if (usuarioExistente)
             {
                 ModelState.AddModelError(nameof(UsuarioViewModel.Email), "Já existe um usuário com o mesmo Email.");
-                return View(viewModel);
+                return View(request);
             }
 
-            //var novoUsuario = new Usuario
-            //{
-            //    Nome = viewModel.Nome,
-            //    Email = viewModel.Email,
-            //    Senha = viewModel.Senha
-            //};
+            var novoUsuario = new Usuario
+            {
+                Nome = request.Nome,
+                Email = request.Email,
+                Senha = request.Senha,
+                DataCadastro = DateTime.Now
+            };
 
-            //_context.Set<Usuario>().Add(novoUsuario);
-            //_context.SaveChanges();
+            _context.Set<Usuario>().Add(novoUsuario);
+            _context.SaveChanges();
 
-            //Redirecionar para a próxima página.
-            return RedirectToAction("");
-        }
-
-        [HttpGet]
-        [HttpGet]
-        public IActionResult CadastradoSucesso()
-        {
-            // Página de sucesso após o cadastro
-            return View();
+            return RedirectToAction("Login", "Autenticacao"); 
         }
     }
 }

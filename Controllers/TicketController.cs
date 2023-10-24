@@ -10,7 +10,8 @@ using Tickest.Models.ViewModels;
 
 namespace Tickest.Controllers
 {
-    [Authorize(Roles = "administrador")]
+    //AUTHORIZE = USUÁRIO AUTENTICADO (APENAS USUÁRIOS AUTENTICADOS)
+    [Authorize]
     public class TicketController : BaseController
     {
         public TicketController(Contexto context, IHttpContextAccessor httpContextAccessor) : base(context, httpContextAccessor)
@@ -120,10 +121,13 @@ namespace Tickest.Controllers
             _context.SaveChanges();
         }
 
-        #endregion 
+        #endregion
+
+        #region Cadastrar
 
         [HttpGet]
-        public IActionResult Form(int? id)
+        [Authorize(Roles = "administrador")] //USUÁRIO AUTENTICADO E TEM A ROLE ADMINISTRADO
+        public IActionResult Cadastrar(int? id)
         {
             //CARREGAR A TELA 
 
@@ -151,27 +155,9 @@ namespace Tickest.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        public IActionResult Listagem()
-        {
-            //Verificar quais tickets estão abertos e apresentar na tela
-            List<TicketViewModel> viewModels = _context.Set<Ticket>()
-                .Where(p => p.TicketStatus == TicketStatus.Aberto)
-                .Select(p => new TicketViewModel
-                {
-                    //Adicionar o que for necessário para apresentar o Ticket
-                    Titulo = p.Titulo,
-                    Descricao = p.Descricao,
-                    DataLimite = p.DataLimite,
-                    DepartamentoSelectionado = p.DepartamentoId,
-                                 
-                }).ToList();
-
-            return View(viewModels);
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Form(TicketViewModel request)
+        [Authorize(Roles = "administrador")] //USUÁRIO AUTENTICADO E TEM A ROLE ADMINISTRADO
+        public async Task<IActionResult> Cadastrar(TicketViewModel request)
         {
             // ENVIA DADOS TELA
 
@@ -221,9 +207,28 @@ namespace Tickest.Controllers
 
             _context.SaveChanges();
 
-            return View(request);
+            return RedirectToAction("Listagem");
         }
 
-     
+        #endregion
+
+        [HttpGet]
+        public IActionResult Listagem()
+        {
+            //Verificar quais tickets estão abertos e apresentar na tela
+            List<TicketViewModel> viewModels = _context.Set<Ticket>()
+                .Where(p => p.TicketStatus == TicketStatus.Aberto)
+                .Select(p => new TicketViewModel
+                {
+                    //Adicionar o que for necessário para apresentar o Ticket
+                    Titulo = p.Titulo,
+                    Descricao = p.Descricao,
+                    DataLimite = p.DataLimite,
+                    DepartamentoSelectionado = p.DepartamentoId,
+
+                }).ToList();
+
+            return View(viewModels);
+        }
     }
 }

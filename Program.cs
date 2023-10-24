@@ -24,7 +24,7 @@ namespace Tickest
             {
                 opt.Cookie.HttpOnly = true;
                 opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-                opt.LoginPath = new PathString("/login");
+                opt.LoginPath = new PathString("/Autenticacao/Login");
                 opt.AccessDeniedPath = new PathString("/acesso-negado");
                 opt.ExpireTimeSpan = TimeSpan.FromDays(10);
             });
@@ -50,7 +50,7 @@ namespace Tickest
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Ticket}/{action=Form}/{id?}");
+                pattern: "{controller=Ticket}/{action=Listagem}/{id?}");
 
             app.Run();
 

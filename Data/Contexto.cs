@@ -8,10 +8,12 @@ namespace Tickest.Data
     {
         public Contexto(DbContextOptions<Contexto> options) : base(options)
         {
-
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<UsuarioEspecialidade>()
                 .HasOne(ue => ue.Analista)
                 .WithMany(u => u.UsuarioEspecialidades)
@@ -51,9 +53,8 @@ namespace Tickest.Data
                 .WithOne(t => t.Ticket)
                 .HasForeignKey(t => t.TicketId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            base.OnModelCreating(modelBuilder);
         }
+
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Usuario> Solicitantes { get; set; }
         public DbSet<Usuario> Analistas { get; set; }
@@ -65,6 +66,5 @@ namespace Tickest.Data
         public DbSet<UsuarioEspecialidade> UsuarioEspecialidades { get; set; }
         public DbSet<UsuarioRegra> UsuarioRegras { get; set; }
         public DbSet<UsuarioRegraMapeamento> UsuarioRegraMapeamentos { get; set; }
-
     }
 }
